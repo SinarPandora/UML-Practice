@@ -1,0 +1,30 @@
+@startuml
+!theme vibrant
+skinparam style strictuml
+mainframe Usecase
+
+left to right direction
+
+:QQ User: as user
+:Bot Manager: as manager
+
+user -> (Talk with bot)
+(Talk with bot) <-. (Get response) : include
+(Talk with bot) <-. (Ask bot) : include
+(Ask bot) <. (Ask for daily picture) : extend
+note right of (Ask for daily picture) : One single function as example
+
+user <|-- manager
+
+manager -> (Manage behavior)
+(Manage behavior) <-. (Update behavior script) : include
+(Manage behavior) <-. (Reload behavior script) : include
+(Update behavior script) <. (Update behavior lambda script) : extend
+note right of (Update behavior script) : The script is SXDL\n(Step eXtension Definition Language)
+
+manager --> (Config bot)
+(Config bot) <-. (Update config) : include
+(Config bot) <-. (Shutdown bot) : include
+(Config bot) <-. (Restart bot) : include
+
+@enduml

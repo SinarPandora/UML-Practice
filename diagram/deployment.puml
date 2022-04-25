@@ -1,0 +1,25 @@
+@startuml
+!theme vibrant
+skinparam style strictuml
+mainframe Deployment
+
+left to right direction
+
+node "Proxy Server" as proxy {
+    [Go-Mirai Proxy]
+}
+
+node "Application Server" as app {
+  [Jam Application] as jam
+  [Embedded SQLite] as db
+  [Java Runtime] as rt
+}
+
+node "Script FTP" as ftp {
+  [FTP Server]
+}
+
+proxy -- app : http
+app --- ftp : ftp
+
+@enduml
