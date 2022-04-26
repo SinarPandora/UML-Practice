@@ -1,9 +1,10 @@
 @startuml
 !theme vibrant
 'skinparam style strictuml
+skinparam linetype ortho
 mainframe Class
 
-package match.pattern {
+package matcher {
     class MatcherGroup {
         global: List<ContentMatcher>
         globalGroup: List<ContentMatcher>
@@ -33,37 +34,134 @@ package match.pattern {
     ContentMatcher o- MatcherType
 }
 
-interface Executable {
-    execute(context: CommandExecuteContext)
+note top of matcher : Define what kind of message will be matched and trigger the engine
+
+package executables {
+    interface Executable {
+        execute(context: CommandExecuteContext)
+    }
+
+    class Step {
+        stepId: Long
+        executable: Executable
+        execute(context: CommandExecuteContext)
+    }
+    note right of Step : It have own execute method\nto call the executable it has
+    Executable <|.. Step
+
+    package command {
+        interface Command
+        Executable <|- Command
+
+        class DiceCommand
+        Command <|.. DiceCommand
+
+        class MusicShareCommand
+        Command <|.. MusicShareCommand
+
+        class WeatherCommand
+        Command <|.. WeatherCommand
+    }
+}
+note top of executables : Define which behaviour will be executed when message is matched
+
+package engine {
+'    package parser {
+'        interface Parser {
+'            parse(message: String)
+'        }
+'
+'        class SSDLParser
+'        Parser <|.. SSDLParser
+'
+'        class STDLParser
+'        Parser <|.. STDLParser
+'
+'        SSDLParser "1" -- "1" MatcherGroup : Generated
+'        SSDLParser "1" -- "n" Step : Generated
+'        SSDLParser "1" -- "n" Command : Generated
+'    }
+'    note top of parser : Define how to parse the behaviour script
+
+    package runner {
+        class CommandExecuteContext {
+            message: EventMessage
+            matchedTime: TimeStamp
+            tempVars: Map<String, Object>
+        }
+        Executable ..> CommandExecuteContext
+
+        class SSDLRuleRunner {
+            executeIfFound(event: EventMessage)
+            findMatchedStep(message: String, matcherGroup: MatcherGroup)
+        }
+        SSDLRuleRunner "1" o- "1" MatcherGroup
+        SSDLRuleRunner -- Executable : Execute
+
+        package extra.behavior {
+            class Behavior {
+                chatInfo: ChatInfo
+                behavior: Function
+            }
+            class BehaviorRouter {
+                behaviors: List<Behavior>
+                forwardIfFound(event: EventMessage)
+            }
+            BehaviorRouter "1" *- "n" Behavior
+        }
+
+        SSDLRuleRunner "1" o-- "n" BehaviorRouter
+        SSDLRuleRunner -- CommandExecuteContext : Create
+    }
+    note top of runner : Define how to perform the behaviour(executable)
+}
+note top of engine : The parser part has been hidden
+
+package events {
+    package message {
+        abstract class EventMessage {
+            message: String
+            timestamp: TimeStamp
+            messageId: Long
+            sender: SpecificSender
+            messageType: String
+        }
+        CommandExecuteContext "1" o-- "1" EventMessage
+
+        class EventGroupMessage {
+            ...
+            messageType: String = "GROUP"
+            group: Group
+        }
+        EventMessage <|-- EventGroupMessage
+
+        class EventPrivateMessage {
+            ...
+            messageType: String = "PRIVATE"
+            group: Group
+        }
+        EventMessage <|- EventPrivateMessage
+    }
+
+    class SpecificSender {
+        chat: ChatInfo
+        qid: Long
+    }
+    EventMessage "1" o- "1" SpecificSender
+
+    class ChatInfo {
+        type: ChatType
+        chatId: Long
+    }
+    SpecificSender --> ChatInfo
+    ChatInfo "1" o- "1" ChatType
+
+    enum ChatType {
+        Private
+        Group
+    }
 }
 
-class CommandExecuteContext {
-    message: EventMessage
-    sender: SpecificSender
-    matchedTime: TimeStamp
-    tempVars: Map<String, Object>
-}
-
-Executable ..> CommandExecuteContext
-
-class SpecificSender {
-    chat: ChatInfo
-    qid: Long
-}
-
-CommandExecuteContext "1" o-- "1" SpecificSender
-
-class ChatInfo {
-    type: ChatType
-    chatId: Long
-}
-
-SpecificSender --> ChatInfo
-ChatInfo o- ChatType
-
-enum ChatType {
-    Private
-    Group
-}
+note top of events : Define the event(message) metadata
 
 @enduml
