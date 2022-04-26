@@ -8,7 +8,7 @@ boundary "Go-Mirai\nProxy"      as proxy
 control "QMessageListener"      as listener
 control "SSDLRuleRunner"        as ruleRunner
 control "BehaviorRouter"        as bRouter
-control "Behavior A"            as exb
+participant "Behavior A"        as exb
 participant "Command A"         as cmd
 participant "HttpAPI Client"    as api
 database "Database"             as db
