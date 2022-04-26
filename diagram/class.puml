@@ -1,27 +1,69 @@
 @startuml
-'https://plantuml.com/class-diagram
+!theme vibrant
+'skinparam style strictuml
+mainframe Class
 
-abstract class AbstractList
-abstract AbstractCollection
-interface List
-interface Collection
+package match.pattern {
+    class MatcherGroup {
+        global: List<ContentMatcher>
+        globalGroup: List<ContentMatcher>
+        globalPrivate: List<ContentMatcher>
+        custom: List<ContentMatcher>
+    }
 
-List <|-- AbstractList
-Collection <|-- AbstractCollection
+    class ContentMatcher {
+        stepId: Long
+        messageTemplate: String
+        type: MatcherType
+        matcherFunction: Function2<String, String, Boolean>
+        ---
+        isMatched(string: String)
+    }
 
-Collection <|- List
-AbstractCollection <|- AbstractList
-AbstractList <|-- ArrayList
+    MatcherGroup "1" o-- "n" ContentMatcher
 
-class ArrayList {
-Object[] elementData
-size()
+    enum MatcherType {
+        REGEX
+        EQUALS
+        CONTAINS
+        ENDS_WITH
+        STARTS_WITH
+    }
+
+    ContentMatcher o- MatcherType
 }
 
-enum TimeUnit {
-DAYS
-HOURS
-MINUTES
+interface Executable {
+    execute(context: CommandExecuteContext)
+}
+
+class CommandExecuteContext {
+    message: EventMessage
+    sender: SpecificSender
+    matchedTime: TimeStamp
+    tempVars: Map<String, Object>
+}
+
+Executable ..> CommandExecuteContext
+
+class SpecificSender {
+    chat: ChatInfo
+    qid: Long
+}
+
+CommandExecuteContext "1" o-- "1" SpecificSender
+
+class ChatInfo {
+    type: ChatType
+    chatId: Long
+}
+
+SpecificSender --> ChatInfo
+ChatInfo o- ChatType
+
+enum ChatType {
+    Private
+    Group
 }
 
 @enduml

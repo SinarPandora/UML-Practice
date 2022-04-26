@@ -7,8 +7,8 @@ actor "User\n(QQ Member)"       as user
 boundary "Go-Mirai\nProxy"      as proxy
 control "QMessageListener"      as listener
 control "SSDLRuleRunner"        as ruleRunner
-control "FSMModeRouter"         as fsm
-control "Extra Behavior A"      as exb
+control "BehaviorRouter"        as bRouter
+control "Behavior A"            as exb
 participant "Command A"         as cmd
 participant "HttpAPI Client"    as api
 database "Database"             as db
@@ -33,20 +33,20 @@ note right of listener : Omit the logic of pre-handler
 listener -> ruleRunner++ : 4: process event message
 
 'Extra behavior
-ruleRunner -> fsm++ : 4.1: find extra behavior pattern
+ruleRunner -> bRouter++ : 4.1: find extra behavior pattern
 alt Find extra behavior pattern in use
-        fsm -> exb++ : 4.1.1: forward message to extra behavior
+        bRouter -> exb++ : 4.1.1: forward message to extra behavior
         exb -> exb: 4.1.2: process extra behavior
         note right of exb : Omit the logic of behavior
-        fsm <-- exb-- : 4.1.3: return
-    ruleRunner <-- fsm : 4.2: return
+        bRouter <-- exb-- : 4.1.3: return
+    ruleRunner <-- bRouter : 4.2: return
 else No extra behavior pattern in use
-    ruleRunner <-- fsm : 4.2: no pattern found
+    ruleRunner <-- bRouter : 4.2: no pattern found
 end
-fsm--
+bRouter--
 
 'Run rule
-ruleRunner -> ruleRunner : 4.3: find matched steps
+ruleRunner -> ruleRunner : 4.3: find matched matcher
 ruleRunner -> cmd++ : 4.4: run SSDL rule
     cmd -> api++ : 4.4.1: send message in rule logic
         api -> proxy++ : 4.4.1.1: push message
