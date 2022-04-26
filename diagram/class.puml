@@ -164,4 +164,14 @@ package events {
 
 note top of events : Define the event(message) metadata
 
+package listener {
+    class QMessageListener {
+        listenEventMessage(message: EventMessage)
+    }
+    QMessageListener ..> EventMessage
+    QMessageListener - SSDLRuleRunner : Forward
+}
+
+note top of listener : Define the event listener
+
 @enduml
