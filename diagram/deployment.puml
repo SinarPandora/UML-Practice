@@ -20,6 +20,6 @@ node "Script FTP" as ftp {
 }
 
 proxy -- app : +HTTP
-app --- ftp : +FTP
+app -- ftp : +FTP
 
 @enduml
