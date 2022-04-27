@@ -4,7 +4,7 @@
 skinparam linetype ortho
 mainframe Class
 
-package matcher {
+package matcher.message {
     class MatcherGroup {
         global: List<ContentMatcher>
         globalGroup: List<ContentMatcher>
@@ -34,7 +34,7 @@ package matcher {
     ContentMatcher o- MatcherType
 }
 
-note top of matcher : Define what kind of message will be matched and trigger the engine
+note top of matcher.message : Define what kind of message will be matched and trigger the engine
 
 package executables {
     interface Executable {
@@ -95,7 +95,7 @@ package engine {
             executeIfFound(event: EventMessage)
             findMatchedStep(message: String, matcherGroup: MatcherGroup)
         }
-        SSDLRuleRunner "1" o- "1" MatcherGroup
+        SSDLRuleRunner "1" o--- "1" MatcherGroup
         SSDLRuleRunner -- Executable : Execute
 
         package extra.behavior {
@@ -115,7 +115,7 @@ package engine {
     }
     note top of runner : Define how to perform the behaviour(executable)
 }
-note top of engine : The parser part has been hidden
+note top of engine : The parser has been hidden
 
 package events {
     package message {
