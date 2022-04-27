@@ -1,0 +1,22 @@
+@startuml
+
+!theme vibrant
+skinparam style strictuml
+skinparam linetype ortho
+mainframe Communication
+
+left to right direction
+
+rectangle Matcher as matcher
+rectangle Behavior as behavior
+rectangle EventMessage as event
+rectangle Step as step
+rectangle Command as command
+
+event ------ behavior : 1: forwardIfFound →
+behavior --left-- matcher : 2: isMatched ↑
+behavior -down-- behavior
+matcher ---- step : 3: execute
+step ---- command : 4: execute
+
+@enduml

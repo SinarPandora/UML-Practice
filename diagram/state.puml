@@ -1,0 +1,19 @@
+@startuml
+!theme vibrant
+skinparam style strictuml
+mainframe State
+hide empty description
+
+state "ListeningBehavior" as listen
+state "AskingBehavior" as asking
+state "WeatherQueryBehavior" as query
+
+[*] --> listen
+
+listen ---> asking : Ask for weather
+asking ---> query : Query weather info
+query ---> asking : Return
+asking ---> listen : Return
+
+
+@enduml
