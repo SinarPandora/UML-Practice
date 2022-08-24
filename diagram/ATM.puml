@@ -1,0 +1,30 @@
+@startuml
+skinparam style strictuml
+mainframe Message processing
+
+actor "持卡人"                as user
+boundary "ATM"                as atm
+participant "取款系统"        as sys
+participant "银行账户系统"    as bank
+
+user++
+user -> atm++ : 选择取款功能
+atm -> sys++  : 创建取款会话
+atm <-- sys    : 返回提示信息
+user <-- atm   : 显示提示信息
+
+user -> atm   : 输入提款金额
+atm -> sys    : 调用提款方法
+sys -> bank++ : 发起提款请求
+sys <-- bank   : 返回响应信息
+
+alt 提款是否失败
+    sys -> sys  : 转换错误响应为提示信息
+    atm <-- sys : 返回提示信息
+    user <-- atm : 显示提示信息
+end
+
+atm <-- sys : 返回提款成功信息
+user <-- atm: 显示提款成功信息
+
+@enduml

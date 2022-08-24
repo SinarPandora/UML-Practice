@@ -1,0 +1,76 @@
+@startuml
+!theme vibrant
+skinparam style strictuml
+mainframe Message processing
+
+actor User as user
+boundary Tire as tire
+control Sensor as sensor
+'entity SensorData
+control DataSender as sender
+control DataReceiver as receiver
+control "ControlSystem\nBusiness Controller" as system
+boundary Monitor as monitor
+boundary Alarm as alarm
+
+user++
+tire++
+sensor++
+receiver++
+system++
+monitor++
+
+group 初始化胎压监测
+    user -> monitor : 点击初始化胎压监测功能
+    monitor -> system : 初始化胎压监测
+    system -> alarm++ : 初始化报警器
+    alarm --> system
+    alarm--
+    system -> system : 校准开始
+end
+group 更换轮胎/传感器
+    user -> monitor : 点击校准胎压传感器功能
+    monitor -> system : 启动校准胎压传感器工作流
+    system -> monitor : 询问轮胎位置
+    monitor --> user
+    user -> monitor : 选择指定轮胎
+    monitor -> system : 设置轮胎位置
+    system -> system : 校准开始
+end
+
+group 调换轮胎顺序
+    user -> monitor : 点击调换轮胎功能
+    monitor -> system : 启动调换轮胎工作流
+    system -> monitor : 询问轮胎位置
+    monitor --> user
+    user -> monitor : 选择指定轮胎
+    monitor -> system : 设置轮胎位置
+    system -> monitor : 询问目标轮胎位置
+    monitor --> user
+    user -> monitor : 选择目标轮胎
+    monitor -> system : 设置目标位置
+    system -> system : 校准开始
+end
+
+group 单轮胎/传感器校准流程
+    user -> tire : 手动充气/放气
+    group 重复多次
+        sensor -> tire : 获取胎压信息
+        sensor -> sender++ : 发送传感器数据
+        sender -> receiver : 转发数据
+        sender--
+        receiver -> system : 接收数据
+        system -> system : 记录单次数据
+    end
+
+    system -> system : 校验多次数据
+
+    alt 校验通过
+        system -> monitor : 校准完毕提示
+        monitor --> user
+    else 校验失败
+        system -> monitor : 校准失败提示
+        monitor --> user
+    end
+end
+@enduml

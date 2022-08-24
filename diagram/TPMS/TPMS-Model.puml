@@ -1,0 +1,29 @@
+@startuml
+!theme vibrant
+skinparam style strictuml
+'skinparam linetype ortho
+left to right direction
+mainframe Domain Models
+
+object Tire
+object Sensor
+object "SensorData\n(Entity)" as SensorData
+object DataSender
+object DataReceiver
+object Monitor
+object Alarm
+object ControlSystem
+
+Tire -- Sensor
+Sensor -- DataSender
+DataSender -- DataReceiver
+DataReceiver -- ControlSystem
+ControlSystem -- Monitor
+ControlSystem -- Alarm
+
+'SensorData -- Sensor
+'SensorData -- DataSender
+'SensorData -- DataReceiver
+'SensorData -- ControlSystem
+
+@enduml

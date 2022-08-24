@@ -1,0 +1,44 @@
+@startuml
+!theme vibrant
+skinparam style strictuml
+mainframe Message processing
+
+actor User as user
+boundary Tire as tire
+control Sensor as sensor
+'entity SensorData
+control DataSender as sender
+control DataReceiver as receiver
+control "ControlSystem\nBusiness Controller" as system
+boundary Monitor as monitor
+boundary Alarm as alarm
+
+user++
+tire++
+sensor++
+receiver++
+system++
+monitor++
+
+sensor -> tire : 获取胎压数据
+tire --> sensor : 返回
+sensor -> sender++ : 发送传感器数据
+sender -> receiver : 转发数据
+sender--
+receiver -> system : 接收数据
+system -> system : 分析数据
+alt 胎压数据正常
+    system -> monitor : 展示结果
+    monitor --> user
+else 胎压数据不正常
+    system -> monitor : 展示结果
+    monitor --> user
+    system -> monitor : 展示警告信息
+    monitor --> user
+    system -> alarm++ : 发出警告
+    alarm --> user
+    alarm--
+end
+
+
+@enduml
